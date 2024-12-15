@@ -2,23 +2,21 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
-
-# Основные справочные сущности
+# Справочные сущности
 class Worker(models.Model):
     POSITION_CHOICES = [
-        (1, 'Оператор производственной линии'),
-        (2, 'Технолог'),
-        (3, 'Мастер цеха'),
-        (4, 'Инженер по качеству'),
-        (5, 'Контролер ОТК'),
-        (6, 'Начальник смены'),
-        (7, 'Техник-электроник'),
-        (8, 'Сборщик реле'),
-        (9, 'Администратор системы'),
+        ('ОПЛ', 'Оператор производственной линии'),
+        ('ТП', 'Технолог производства'),
+        ('МЦ', 'Мастер цеха'),
+        ('ИПК', 'Инженер по качеству'),
+        ('КОТК', 'Контролер ОТК'),
+        ('НС', 'Начальник смены'),
+        ('ТЭ', 'Техник-электроник'),
+        ('СР', 'Сборщик реле'),
+        ('АИС', 'Администратор информационной системы'),
     ]
-    tab_number = models.CharField(max_length=10, primary_key=True)
-    position = models.IntegerField(
-        choices=POSITION_CHOICES, null=True, blank=True)
+    tab_number = models.CharField(max_length=20, primary_key=True)
+    position = models.CharField(max_length=10, choices=POSITION_CHOICES, null=True, blank=True)  
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
 
@@ -28,6 +26,10 @@ class Worker(models.Model):
 
     def __str__(self):
         return f"{self.last_name} {self.first_name} ({self.tab_number})"
+    
+    def get_position_display(self):
+        """Получить отображаемое название должности"""
+        return dict(self.POSITION_CHOICES).get(self.position, "Не указана")
 
 
 class Workshop(models.Model):
@@ -83,7 +85,7 @@ class Batch(models.Model):
         return timezone.now().date() <= self.finish_date.date()
 
 
-# Основные процессные сущности
+# Оборудование
 class EquipmentModel(models.Model):
     name = models.CharField(max_length=200)
     year = models.IntegerField()
@@ -108,8 +110,7 @@ class Equipment(models.Model):
         ('maintenance', 'На обслуживании'),
         ('retired', 'Списано')
     ]
-    status = models.CharField(
-        max_length=20, choices=status_choices, default='active')
+    status = models.CharField(max_length=20, choices=status_choices, default='active')
 
     class Meta:
         db_table = 'equipment'
@@ -117,33 +118,51 @@ class Equipment(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def age_months(self):
+        return (timezone.now().date() - self.start_date).days // 30
 
-class ManufacturingDefect(models.Model):
-    worker = models.ForeignKey(Worker, on_delete=models.CASCADE)
-    workshop = models.ForeignKey(Workshop, on_delete=models.CASCADE)
-    batch = models.ForeignKey(Batch, on_delete=models.CASCADE)
+
+class EquipmentProduction(models.Model):
     equipment = models.ForeignKey(Equipment, on_delete=models.CASCADE)
-    defect_type = models.ForeignKey(DefectType, on_delete=models.CASCADE)
-    date = models.DateTimeField(auto_now_add=True)
-    comment = models.TextField(null=True, blank=True)
+    date = models.DateField()
+    units_produced = models.IntegerField()
 
     class Meta:
-        db_table = 'manufacturing_defects'
-        verbose_name = "Дефект производства"
-        verbose_name_plural = "Дефекты производства"
+        db_table = 'equipment_production'
+        unique_together = ('equipment', 'date')
+        verbose_name = 'Производство оборудования'
+        verbose_name_plural = 'Производство оборудования'
 
     def __str__(self):
-        return f"Дефект {self.id} (партия {self.batch_id})"
+        return f"{self.equipment.name} - {self.date}: {self.units_produced} ед."
 
-    def clean(self):
-        if self.batch and self.workshop:
-            supported_series = self.workshop.get_supported_series()
-            if self.workshop.id != 3 and self.batch.series not in supported_series:
-                raise ValidationError("Неправильно выбранная партия или цех")
 
-    def save(self, *args, **kwargs):
-        self.clean()
-        super().save(*args, **kwargs)
+class ManufacturingDefect(models.Model):
+    worker_tab_num = models.CharField(max_length=50, verbose_name="Табельный номер работника")
+    workshop = models.ForeignKey(Workshop, on_delete=models.PROTECT, verbose_name="Цех")
+    equipment = models.ForeignKey(Equipment, on_delete=models.PROTECT, verbose_name="Оборудование")
+    batch = models.ForeignKey(Batch, on_delete=models.PROTECT, verbose_name="Партия")
+    defect_type = models.ForeignKey(DefectType, on_delete=models.PROTECT, verbose_name="Тип дефекта")
+    date = models.DateTimeField(auto_now_add=True, verbose_name="Дата")
+    comment = models.TextField(blank=True, verbose_name="Комментарий")
+    
+    # Свойство для получения объекта Worker по табельному номеру
+    @property
+    def worker(self):
+        try:
+            return Worker.objects.get(tab_number=self.worker_tab_num)
+        except Worker.DoesNotExist:
+            return None
+    
+    class Meta:
+        db_table = 'manufacturing_defects'
+        verbose_name = 'Дефект производства'
+        verbose_name_plural = 'Дефекты производства'
+        ordering = ['-date']
+    
+    def __str__(self):
+        return f"Дефект #{self.id} от {self.date.strftime('%d.%m.%Y')}"
 
 
 class Maintenance(models.Model):
