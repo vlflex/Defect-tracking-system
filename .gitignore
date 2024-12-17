@@ -14,7 +14,7 @@ defects/migrations/
 venv/
 env/
 ENV/
-venv_ai/
+pytorch_env/
 requirements.txt
 
 # IDE
