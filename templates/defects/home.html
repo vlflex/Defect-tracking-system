@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Учет дефектов{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0">Учет производственных дефектов</h2>
+            </div>
+            <div class="card-body">
+                <p>Система для учета, анализа и отслеживания производственных дефектов в реальном времени.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">Основные функции</h4>
+            </div>
+            <div class="card-body">
+                <ul class="feature-list">
+                    <li>Регистрация дефектов в реальном времени</li>
+                    <li>Привязка к оборудованию и партиям</li>
+                    <li>Анализ по типам дефектов</li>
+                    <li>Статистика по цехам</li>
+                    <li>Отчетность и аналитика</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Модули системы</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for module in modules %}
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5>{{ module.icon }} {{ module.title }}</h5>
+                                <p>{{ module.description }}</p>
+                                <a href="{{ module.url }}" class="btn btn-primary btn-sm">Перейти</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Быстрый доступ</h4>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="/defects/form/" class="btn btn-primary">Ввести дефект</a>
+                    <a href="/defects/list/" class="btn btn-outline-primary">Список дефектов</a>
+                    <a href="/defects/dashboard/" class="btn btn-outline-success">Dashboard</a>
+                    <a href="/ai/" class="btn btn-outline-info">AI Анализ</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

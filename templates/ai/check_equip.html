@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}Проверка оборудования{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0">Проверка оборудования</h2>
+            </div>
+            <div class="card-body">
+                <p>Анализ состояния оборудования и прогнозирование необходимости замены.</p>
+                {% if not model_loaded %}
+                    <div class="alert alert-warning">
+                        ⚠️ Модель не загружена. <a href="/ai/">Подробнее</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if model_loaded %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Выберите оборудование для анализа</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-9 mb-3">
+                            <label class="form-label">Оборудование</label>
+                            {{ form.equipment }}
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="submit" class="btn btn-primary w-100">
+                                Анализировать
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if recommendation %}
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">Результаты анализа: {{ recommendation.equipment }}</h4>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-8">
+                        <p class="mb-1"><strong>Цех:</strong> {{ recommendation.workshop }}</p>
+                        <p class="mb-1"><strong>Модель:</strong> {{ recommendation.model }}</p>
+                        <p class="mb-1"><strong>Уверенность:</strong> {{ recommendation.confidence }}</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div class="h4 mb-2">{{ recommendation.prediction }}</div>
+                        <div class="small text-muted">{{ recommendation.status_text }}</div>
+                    </div>
+                </div>
+                
+                <h5>Характеристики оборудования</h5>
+                <div class="equipment-details">
+                    <div class="detail-item">
+                        <span class="detail-value">{{ recommendation.age_years }}</span>
+                        <span class="detail-label">Лет</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-value">{{ recommendation.defect_count }}</span>
+                        <span class="detail-label">Дефектов/год</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-value">{{ recommendation.maintenance_count }}</span>
+                        <span class="detail-label">Обслуживаний</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-value">{{ recommendation.stats.months_in_operation }}</span>
+                        <span class="detail-label">Месяцев работы</span>
+                    </div>
+                </div>
+                
+                <h5 class="mt-4">Статистика</h5>
+                <div class="equipment-details">
+                    <div class="detail-item">
+                        <span class="detail-value">{{ recommendation.stats.total_defects }}</span>
+                        <span class="detail-label">Всего дефектов</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-value">{{ recommendation.stats.total_maintenance }}</span>
+                        <span class="detail-label">Всего обслуживаний</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-value">{{ recommendation.stats.total_production }}</span>
+                        <span class="detail-label">Произведено</span>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h5>Факторы решения:</h5>
+                    <ul class="feature-list">
+                        {% if recommendation.age_years > 15 %}
+                        <li>Высокий возраст (более 15 лет)</li>
+                        {% elif recommendation.age_years > 10 %}
+                        <li>Средний возраст (10-15 лет)</li>
+                        {% else %}
+                        <li>Низкий возраст (менее 10 лет)</li>
+                        {% endif %}
+                        
+                        {% if recommendation.defect_count > 30 %}
+                        <li>Много дефектов за год</li>
+                        {% elif recommendation.defect_count > 15 %}
+                        <li>Среднее количество дефектов</li>
+                        {% else %}
+                        <li>Мало дефектов за год</li>
+                        {% endif %}
+                    </ul>
+                </div>
+                
+                <div class="alert alert-info mt-4">
+                    <h6>Интерпретация результата</h6>
+                    <p class="mb-0">
+                        {% if recommendation.prediction == 'РЕКОМЕНДУЕТСЯ ЗАМЕНА' %}
+                            Оборудование достигло критического состояния. Рекомендуется рассмотреть вопрос о замене.
+                        {% else %}
+                            Оборудование в нормальном состоянии. Можно продолжать эксплуатацию.
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% elif model_loaded and not recommendation %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <div class="mb-3">
+                    <span class="display-1">🔍</span>
+                </div>
+                <h4>Выберите оборудование для анализа</h4>
+                <p class="text-muted">После выбора система проанализирует состояние оборудования</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if model_loaded %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">API для интеграции</h4>
+            </div>
+            <div class="card-body">
+                <p>Для программного доступа доступен REST API:</p>
+                <div class="bg-dark text-light p-3 rounded">
+                    <code>GET /ai/api/predict/&lt;id_оборудования&gt;/</code><br>
+                    <small class="text-muted">Пример: <a href="/ai/api/predict/1/" class="text-light">/ai/api/predict/1/</a></small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

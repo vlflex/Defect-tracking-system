@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}AI Анализ{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0">AI Анализ состояния оборудования</h2>
+            </div>
+            <div class="card-body">
+                <p>Нейросетевая система анализа состояния оборудования и прогнозирования необходимости замены.</p>
+                {% if model_loaded %}
+                    <div class="alert alert-success">
+                        ✅ Модель загружена | F1 Score: {{ model_f1|floatformat:4 }}
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning">
+                        ⚠️ Модель не загружена. Необходимо обучить модель.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">Возможности системы</h4>
+            </div>
+            <div class="card-body">
+                <ul class="feature-list">
+                    <li>Анализ состояния оборудования по нескольким параметрам</li>
+                    <li>Прогнозирование остаточного ресурса</li>
+                    <li>Рекомендации по обслуживанию и замене</li>
+                    <li>Интеграция с системой учета дефектов</li>
+                    <li>Подробная статистика и отчеты</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Доступные инструменты</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5>Проверка оборудования</h5>
+                                <p>Анализ конкретного оборудования на необходимость замены.</p>
+                                <a href="/ai/check-equip/" class="btn btn-primary btn-sm">Перейти</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5>Информация о модели</h5>
+                                <p>Технические характеристики нейросетевой модели.</p>
+                                <a href="/ai/model-info/" class="btn btn-primary btn-sm">Перейти</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Как это работает?</h4>
+            </div>
+            <div class="card-body">
+                <p>Нейронная сеть анализирует 4 ключевых параметра:</p>
+                <ol class="small">
+                    <li>Возраст оборудования</li>
+                    <li>Количество дефектов за год</li>
+                    <li>Частота обслуживания</li>
+                    <li>Год выпуска модели</li>
+                </ol>
+                <div class="alert alert-info">
+                    <strong>Принцип принятия решений:</strong><br>
+                    Порог: 0.5<br>
+                    Если вероятность > 0.5 - рекомендуется замена
+                </div>
+                <a href="/ai/check-equip/" class="btn btn-primary w-100">
+                    Проверить оборудование
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
