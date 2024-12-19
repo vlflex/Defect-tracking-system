@@ -1,37 +1,97 @@
-{% extends "defects/base.html" %}
+{% extends "base.html" %}
+
+{% block title %}Список дефектов{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2>Список дефектов</h2>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Дата</th>
-                <th>Партия</th>
-                <th>Серия</th>
-                <th>Цех</th>
-                <th>Тип дефекта</th>
-                <th>Рабочий</th>
-                <th>Комментарий</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for defect in defects %}
-            <tr>
-                <td>{{ defect.date }}</td>
-                <td>{{ defect.batch }}</td>
-                <td>{{ defect.batch.series }}</td>  <!-- Изменено здесь -->
-                <td>{{ defect.workshop }}</td>
-                <td>{{ defect.defect_type }}</td>
-                <td>{{ defect.worker }} ({{ defect.worker.tab_number }})</td>
-                <td>{{ defect.comment }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="7">Нет записей о дефектах</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h2 class="mb-0">Список дефектов</h2>
+                        <p class="mb-0 text-muted small">Всего: {{ total_count }}</p>
+                    </div>
+                    <div class="col-auto">
+                        <a href="/defects/form/" class="btn btn-primary btn-sm">+ Новый дефект</a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Фильтры -->
+                <form method="get" class="mb-4">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <input type="text" name="search" class="form-control" placeholder="Поиск..." 
+                                   value="{{ search_query }}">
+                        </div>
+                        <div class="col-md-3">
+                            <select name="workshop" class="form-control">
+                                <option value="">Все цеха</option>
+                                {% for workshop in workshops %}
+                                <option value="{{ workshop.id }}" 
+                                        {% if selected_workshop == workshop.id|stringformat:"i" %}selected{% endif %}>
+                                    {{ workshop.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select name="batch" class="form-control">
+                                <option value="">Все партии</option>
+                                {% for batch in batches %}
+                                <option value="{{ batch.id }}"
+                                        {% if selected_batch == batch.id|stringformat:"i" %}selected{% endif %}>
+                                    {{ batch.series }} ({{ batch.id }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-outline-primary w-100">Фильтр</button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Таблица -->
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Дата</th>
+                                <th>Партия</th>
+                                <th>Цех</th>
+                                <th>Тип дефекта</th>
+                                <th>Рабочий</th>
+                                <th>Комментарий</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for defect in defects %}
+                            <tr>
+                                <td>{{ defect.date|date:"d.m.Y H:i" }}</td>
+                                <td>{{ defect.batch.series }}</td>
+                                <td>{{ defect.workshop.name }}</td>
+                                <td>{{ defect.defect_type.name }}</td>
+                                <td>{{ defect.worker_tab_num }}</td>
+                                <td>{{ defect.comment|truncatechars:30|default:"-" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center">Нет записей о дефектах</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="d-flex justify-content-between">
+                    <a href="/defects/" class="btn btn-outline-secondary">На главную дефектов</a>
+                    <a href="/defects/form/" class="btn btn-primary">Ввести новый дефект</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

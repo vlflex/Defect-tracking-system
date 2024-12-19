@@ -1,64 +1,69 @@
-{% extends "defects/base.html" %}
+{% extends "base.html" %}
+
+{% block title %}Ввод дефекта{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2>Форма ввода дефекта</h2>
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %}">
-                {{ message }}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0">Форма ввода дефекта</h2>
             </div>
-        {% endfor %}
-    {% endif %}
-    <form method="post">
-        {% csrf_token %}
-        
-        <!-- Поле для табельного номера -->
-        <div class="mb-3">
-            <label for="id_worker_tab_number" class="form-label">Табельный номер рабочего</label>
-            {{ form.worker_tab_number }}
-            {% if form.worker_tab_number.errors %}
-                <div class="text-danger">{{ form.worker_tab_number.errors }}</div>
-            {% endif %}
+            <div class="card-body">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Работник</label>
+                            {{ form.worker_tab_num }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Партия</label>
+                            {{ form.batch }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Тип дефекта</label>
+                            {{ form.defect_type }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Цех</label>
+                            {{ form.workshop }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Оборудование</label>
+                            {{ form.equipment }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Комментарий</label>
+                            {{ form.comment }}
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex">
+                        <button type="submit" class="btn btn-primary">Отправить</button>
+                        <a href="/defects/list/" class="btn btn-outline-primary">Список дефектов</a>
+                        <a href="/defects/dashboard/" class="btn btn-outline-success">Dashboard</a>
+                        <a href="/defects/" class="btn btn-outline-secondary">На главную</a>
+                    </div>
+                </form>
+            </div>
         </div>
-        
-        <!-- Поле для партии -->
-        <div class="mb-3">
-            <label for="id_batch" class="form-label">{{ form.batch.label }}</label>
-            {{ form.batch }}
-            {% if form.batch.errors %}
-                <div class="text-danger">{{ form.batch.errors }}</div>
-            {% endif %}
-        </div>
-        
-        <!-- Поле для типа дефекта -->
-        <div class="mb-3">
-            <label for="id_defect_type" class="form-label">{{ form.defect_type.label }}</label>
-            {{ form.defect_type }}
-            {% if form.defect_type.errors %}
-                <div class="text-danger">{{ form.defect_type.errors }}</div>
-            {% endif %}
-        </div>
-        
-        <!-- Поле для цеха -->
-        <div class="mb-3">
-            <label for="id_workshop" class="form-label">{{ form.workshop.label }}</label>
-            {{ form.workshop }}
-            {% if form.workshop.errors %}
-                <div class="text-danger">{{ form.workshop.errors }}</div>
-            {% endif %}
-        </div>
-        
-        <!-- Поле для комментария -->
-        <div class="mb-3">
-            <label for="id_comment" class="form-label">{{ form.comment.label }}</label>
-            {{ form.comment }}
-            {% if form.comment.errors %}
-                <div class="text-danger">{{ form.comment.errors }}</div>
-            {% endif %}
-        </div>
-        
-        <button type="submit" class="btn btn-primary">Отправить</button>
-    </form>
+    </div>
 </div>
 {% endblock %}
