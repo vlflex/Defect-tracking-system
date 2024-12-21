@@ -1,12 +1,33 @@
-{% extends "defects/base.html" %}
+{% extends "base.html" %}
+
+{% block title %}Вход в систему{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2>Вход в систему</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Войти</button>
-    </form>
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0 text-center">Вход в систему</h2>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Имя пользователя</label>
+                        <input type="text" name="username" class="form-control" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Пароль</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100 mb-2">Войти</button>
+                    <a href="/" class="btn btn-outline-secondary w-100">На главную</a>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
