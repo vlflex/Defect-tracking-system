@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
-class User(AbstractUser):
+class Worker(models.Model):
     POSITION_CHOICES = [
         (1, 'Оператор производственной линии'),
         (2, 'Технолог'),
@@ -14,23 +14,17 @@ class User(AbstractUser):
         (9, 'Администратор системы'),
     ]
     
+    tab_number = models.CharField(max_length=10, primary_key=True)  # Используем tab_number как первичный ключ
     position = models.IntegerField(choices=POSITION_CHOICES, null=True, blank=True)
-    tab_number = models.CharField(max_length=10, unique=True)
-    
-    groups = models.ManyToManyField(
-        'auth.Group',
-        verbose_name='groups',
-        blank=True,
-        related_name='custom_user_set',
-        related_query_name='user'
-    )
-    user_permissions = models.ManyToManyField(
-        'auth.Permission',
-        verbose_name='user permissions',
-        blank=True,
-        related_name='custom_user_set',
-        related_query_name='user'
-    )
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+
+    class Meta:
+        db_table = 'workers'
+        managed = False  
+
+    def __str__(self):
+        return f"{self.last_name} {self.first_name} ({self.tab_number})"
 
 class Workshop(models.Model):
     name = models.CharField(max_length=100)
@@ -42,7 +36,6 @@ class Workshop(models.Model):
     class Meta:
         db_table = 'workshops'
         
-
 class DefectType(models.Model):
     name = models.CharField(max_length=200)
 
@@ -78,7 +71,7 @@ class Batch(models.Model):
 class ManufacturingDefect(models.Model):
     batch = models.ForeignKey(Batch, on_delete=models.CASCADE, verbose_name="Партия")
     workshop = models.ForeignKey(Workshop, on_delete=models.CASCADE, verbose_name="Цех")
-    worker = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Рабочий")
+    worker = models.ForeignKey(Worker, on_delete=models.CASCADE, verbose_name="Рабочий")
     defect_type = models.ForeignKey(DefectType, on_delete=models.CASCADE, verbose_name="Тип дефекта")
     date = models.DateTimeField(auto_now_add=True, verbose_name="Дата")
     comment = models.TextField(null=True, blank=True, verbose_name="Комментарий")

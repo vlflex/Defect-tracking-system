@@ -1,9 +1,12 @@
 from django.contrib import admin
-from .models import User, Workshop, DefectType, Batch, ManufacturingDefect
+from .models import Worker, Workshop, DefectType, Batch, ManufacturingDefect
 
-@admin.register(User)
-class UserAdmin(admin.ModelAdmin):
-    list_display = ('username', 'email', 'get_position_display', 'tab_number')
+@admin.register(Worker)
+class WorkerAdmin(admin.ModelAdmin):
+    list_display = ('tab_number', 'first_name', 'last_name', 'get_position_display')
+    list_display_links = ('tab_number',)
+    search_fields = ('tab_number', 'first_name', 'last_name')
+    ordering = ('tab_number',)
 
 admin.site.register(Workshop)
 admin.site.register(DefectType)

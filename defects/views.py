@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from .forms import DefectForm
-from .models import ManufacturingDefect, User
+from .models import ManufacturingDefect, Worker
 
 @login_required
 def defect_form(request):
@@ -10,13 +10,13 @@ def defect_form(request):
         form = DefectForm(request.POST)
         if form.is_valid():
             try:
-                worker = User.objects.get(tab_number=form.cleaned_data['worker_tab_number'])
+                worker = Worker.objects.get(tab_number=form.cleaned_data['worker_tab_number'])
                 defect = form.save(commit=False)
                 defect.worker = worker
                 defect.date = timezone.now()
                 defect.save()
                 return redirect('defect_form')
-            except User.DoesNotExist:
+            except Worker.DoesNotExist:
                 form.add_error('worker_tab_number', 'Работник с таким табельным номером не найден')
     else:
         form = DefectForm()

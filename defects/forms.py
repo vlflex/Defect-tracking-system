@@ -1,5 +1,5 @@
 from django import forms
-from .models import ManufacturingDefect, DefectType, Workshop, User
+from .models import ManufacturingDefect, Worker
 
 class DefectForm(forms.ModelForm):
     worker_tab_number = forms.CharField(
