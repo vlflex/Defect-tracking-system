@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from django.contrib import messages
 from .forms import DefectForm
-from .models import ManufacturingDefect, Worker
+from .models import ManufacturingDefect, Worker, Batch
 
 @login_required
 def defect_form(request):
@@ -10,14 +11,16 @@ def defect_form(request):
         form = DefectForm(request.POST)
         if form.is_valid():
             try:
-                worker = Worker.objects.get(tab_number=form.cleaned_data['worker_tab_number'])
                 defect = form.save(commit=False)
-                defect.worker = worker
-                defect.date = timezone.now()
+                defect.worker = form.cleaned_data['worker_tab_number']
                 defect.save()
+                messages.success(request, "Дефект успешно зарегистрирован")
                 return redirect('defect_form')
-            except Worker.DoesNotExist:
-                form.add_error('worker_tab_number', 'Работник с таким табельным номером не найден')
+            
+            except Exception as e:
+                messages.error(request, f"Ошибка при сохранении: {str(e)}")
+        else:
+            messages.error(request, "Пожалуйста, исправьте ошибки в форме")
     else:
         form = DefectForm()
     
@@ -25,5 +28,7 @@ def defect_form(request):
 
 @login_required
 def defect_list(request):
-    defects = ManufacturingDefect.objects.all().order_by('-date')
+    defects = ManufacturingDefect.objects.all().select_related(
+        'batch', 'workshop', 'worker', 'defect_type'
+    ).order_by('-date')
     return render(request, 'defects/defect_list.html', {'defects': defects})

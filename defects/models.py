@@ -1,5 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 class Worker(models.Model):
     POSITION_CHOICES = [
@@ -14,14 +15,14 @@ class Worker(models.Model):
         (9, 'Администратор системы'),
     ]
     
-    tab_number = models.CharField(max_length=10, primary_key=True)  # Используем tab_number как первичный ключ
+    tab_number = models.CharField(max_length=10, primary_key=True)
     position = models.IntegerField(choices=POSITION_CHOICES, null=True, blank=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
 
     class Meta:
         db_table = 'workers'
-        managed = False  
+        managed = False
 
     def __str__(self):
         return f"{self.last_name} {self.first_name} ({self.tab_number})"
@@ -36,6 +37,9 @@ class Workshop(models.Model):
     class Meta:
         db_table = 'workshops'
         
+    def get_supported_series(self):
+        return self.series_array if isinstance(self.series_array, list) else []
+
 class DefectType(models.Model):
     name = models.CharField(max_length=200)
 
@@ -64,15 +68,37 @@ class Batch(models.Model):
     
     class Meta:
         db_table = 'batches'
+        verbose_name_plural = 'Партии'
 
     def __str__(self):
         return f"Партия {self.id} ({self.series})"
 
+    def is_active(self):
+        if self.finish_date is None:
+            return True
+        return timezone.now().date() <= self.finish_date.date()
+
 class ManufacturingDefect(models.Model):
-    batch = models.ForeignKey(Batch, on_delete=models.CASCADE, verbose_name="Партия")
-    workshop = models.ForeignKey(Workshop, on_delete=models.CASCADE, verbose_name="Цех")
-    worker = models.ForeignKey(Worker, on_delete=models.CASCADE, verbose_name="Рабочий")
-    defect_type = models.ForeignKey(DefectType, on_delete=models.CASCADE, verbose_name="Тип дефекта")
+    worker = models.ForeignKey(
+        Worker, 
+        on_delete=models.CASCADE, 
+        verbose_name="Рабочий"
+    )
+    workshop = models.ForeignKey(
+        Workshop, 
+        on_delete=models.CASCADE, 
+        verbose_name="Цех"
+    )
+    batch = models.ForeignKey(
+        Batch, 
+        on_delete=models.CASCADE, 
+        verbose_name="Партия"
+    )
+    defect_type = models.ForeignKey(
+        DefectType, 
+        on_delete=models.CASCADE, 
+        verbose_name="Тип дефекта"
+    )
     date = models.DateTimeField(auto_now_add=True, verbose_name="Дата")
     comment = models.TextField(null=True, blank=True, verbose_name="Комментарий")
 
@@ -83,3 +109,13 @@ class ManufacturingDefect(models.Model):
         verbose_name = "Дефект производства"
         verbose_name_plural = "Дефекты производства"
         db_table = 'manufacturing_defects'
+
+def clean(self):
+    # Проверяем только если оба поля установлены
+    if hasattr(self, 'batch') and hasattr(self, 'workshop') and self.batch and self.workshop:
+        if self.batch.series not in self.workshop.get_supported_series():
+            raise ValidationError("Ошибка выбора цеха или серии реле")
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)

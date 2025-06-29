@@ -3,6 +3,13 @@
 {% block content %}
 <div class="container mt-4">
     <h2>Форма ввода дефекта</h2>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
     <form method="post">
         {% csrf_token %}
         
@@ -12,6 +19,15 @@
             {{ form.worker_tab_number }}
             {% if form.worker_tab_number.errors %}
                 <div class="text-danger">{{ form.worker_tab_number.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <!-- Поле для партии -->
+        <div class="mb-3">
+            <label for="id_batch" class="form-label">{{ form.batch.label }}</label>
+            {{ form.batch }}
+            {% if form.batch.errors %}
+                <div class="text-danger">{{ form.batch.errors }}</div>
             {% endif %}
         </div>
         

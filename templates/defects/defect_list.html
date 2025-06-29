@@ -7,6 +7,8 @@
         <thead>
             <tr>
                 <th>Дата</th>
+                <th>Партия</th>
+                <th>Серия</th>
                 <th>Цех</th>
                 <th>Тип дефекта</th>
                 <th>Рабочий</th>
@@ -17,14 +19,16 @@
             {% for defect in defects %}
             <tr>
                 <td>{{ defect.date }}</td>
+                <td>{{ defect.batch }}</td>
+                <td>{{ defect.batch.series }}</td>  <!-- Изменено здесь -->
                 <td>{{ defect.workshop }}</td>
                 <td>{{ defect.defect_type }}</td>
-                <td>{{ defect.worker.get_full_name|default:defect.worker.username }} ({{ defect.worker.tab_number }})</td>
+                <td>{{ defect.worker }} ({{ defect.worker.tab_number }})</td>
                 <td>{{ defect.comment }}</td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="5">Нет записей о дефектах</td>
+                <td colspan="7">Нет записей о дефектах</td>
             </tr>
             {% endfor %}
         </tbody>
