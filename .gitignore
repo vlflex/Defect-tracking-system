@@ -100,6 +100,7 @@ coverage.xml
 
 # Media
 media/
+*.png
 
 # Static
 staticfiles/

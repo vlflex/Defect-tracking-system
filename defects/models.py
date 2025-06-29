@@ -38,12 +38,19 @@ class Workshop(models.Model):
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+        db_table = 'workshops'
+        
 
 class DefectType(models.Model):
     name = models.CharField(max_length=200)
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+        db_table = 'defect_types'
 
 class Batch(models.Model):
     SERIES_CHOICES = [
@@ -61,6 +68,9 @@ class Batch(models.Model):
     series = models.CharField(max_length=20, choices=SERIES_CHOICES)
     start_date = models.DateTimeField()
     finish_date = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        db_table = 'batches'
 
     def __str__(self):
         return f"Партия {self.id} ({self.series})"
@@ -79,3 +89,4 @@ class ManufacturingDefect(models.Model):
     class Meta:
         verbose_name = "Дефект производства"
         verbose_name_plural = "Дефекты производства"
+        db_table = 'manufacturing_defects'
