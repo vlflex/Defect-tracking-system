@@ -13,3 +13,23 @@ table {
 .form-group {
     margin-bottom: 15px;
 }
+
+.logo-img {
+    height: 40px;
+    width: auto;
+}
+
+/* Стили для админ-панели */
+#header {
+    display: flex;
+    align-items: center;
+    padding: 10px 40px;
+    background: #417690;
+    color: #ffc;
+    overflow: hidden;
+}
+
+#header-logo {
+    height: 40px;
+    margin-right: 20px;
+}
