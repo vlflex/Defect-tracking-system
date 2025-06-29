@@ -1,0 +1,33 @@
+{% extends "defects/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Список дефектов</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Дата</th>
+                <th>Цех</th>
+                <th>Тип дефекта</th>
+                <th>Рабочий</th>
+                <th>Комментарий</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for defect in defects %}
+            <tr>
+                <td>{{ defect.date }}</td>
+                <td>{{ defect.workshop }}</td>
+                <td>{{ defect.defect_type }}</td>
+                <td>{{ defect.worker.get_full_name|default:defect.worker.username }} ({{ defect.worker.tab_number }})</td>
+                <td>{{ defect.comment }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">Нет записей о дефектах</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

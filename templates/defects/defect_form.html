@@ -1,0 +1,48 @@
+{% extends "defects/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Форма ввода дефекта</h2>
+    <form method="post">
+        {% csrf_token %}
+        
+        <!-- Поле для табельного номера -->
+        <div class="mb-3">
+            <label for="id_worker_tab_number" class="form-label">Табельный номер рабочего</label>
+            {{ form.worker_tab_number }}
+            {% if form.worker_tab_number.errors %}
+                <div class="text-danger">{{ form.worker_tab_number.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <!-- Поле для типа дефекта -->
+        <div class="mb-3">
+            <label for="id_defect_type" class="form-label">{{ form.defect_type.label }}</label>
+            {{ form.defect_type }}
+            {% if form.defect_type.errors %}
+                <div class="text-danger">{{ form.defect_type.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <!-- Поле для цеха -->
+        <div class="mb-3">
+            <label for="id_workshop" class="form-label">{{ form.workshop.label }}</label>
+            {{ form.workshop }}
+            {% if form.workshop.errors %}
+                <div class="text-danger">{{ form.workshop.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <!-- Поле для комментария -->
+        <div class="mb-3">
+            <label for="id_comment" class="form-label">{{ form.comment.label }}</label>
+            {{ form.comment }}
+            {% if form.comment.errors %}
+                <div class="text-danger">{{ form.comment.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Отправить</button>
+    </form>
+</div>
+{% endblock %}
