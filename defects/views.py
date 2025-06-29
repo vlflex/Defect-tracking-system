@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.utils import timezone
 from django.contrib import messages
 from .forms import DefectForm
-from .models import ManufacturingDefect, Worker, Batch
+from .models import ManufacturingDefect
+from django.core.exceptions import ValidationError
 
 @login_required
 def defect_form(request):
@@ -16,7 +16,8 @@ def defect_form(request):
                 defect.save()
                 messages.success(request, "Дефект успешно зарегистрирован")
                 return redirect('defect_form')
-            
+            except ValidationError as e:
+                messages.error(request, str(e))
             except Exception as e:
                 messages.error(request, f"Ошибка при сохранении: {str(e)}")
         else:

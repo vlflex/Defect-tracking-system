@@ -110,11 +110,13 @@ class ManufacturingDefect(models.Model):
         verbose_name_plural = "Дефекты производства"
         db_table = 'manufacturing_defects'
 
-def clean(self):
-    # Проверяем только если оба поля установлены
-    if hasattr(self, 'batch') and hasattr(self, 'workshop') and self.batch and self.workshop:
-        if self.batch.series not in self.workshop.get_supported_series():
-            raise ValidationError("Ошибка выбора цеха или серии реле")
+    def clean(self):
+        # Проверяем только если оба поля установлены
+        if hasattr(self, 'batch') and hasattr(self, 'workshop') and self.batch and self.workshop:
+            supported_series = self.workshop.get_supported_series()
+            # Если цех - отдел качества (id=3), пропускаем проверку
+            if self.workshop.id != 3 and self.batch.series not in supported_series:
+                raise ValidationError("Неправильно выбранная партия или цех")
 
     def save(self, *args, **kwargs):
         self.clean()

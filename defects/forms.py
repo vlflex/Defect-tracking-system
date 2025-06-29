@@ -44,14 +44,16 @@ class DefectForm(forms.ModelForm):
         except Worker.DoesNotExist:
             raise forms.ValidationError('Работник с таким табельным номером не найден')
     
-def clean(self):
-    cleaned_data = super().clean()
-    workshop = cleaned_data.get('workshop')
-    batch = cleaned_data.get('batch')
-    
-    # Проверяем только если оба поля установлены
-    if workshop and batch:
-        if batch.series not in workshop.get_supported_series():
-            raise forms.ValidationError("Ошибка выбора цеха или серии реле")
-    
-    return cleaned_data
+    def clean(self):
+        cleaned_data = super().clean()
+        workshop = cleaned_data.get('workshop')
+        batch = cleaned_data.get('batch')
+        
+        if workshop and batch:
+            supported_series = workshop.get_supported_series()
+            # Если цех - отдел качества (id=3), пропускаем проверку
+            if workshop.id != 3 and batch.series not in supported_series:
+                self.add_error('workshop', "Неправильно выбранная партия или цех")
+                self.add_error('batch', "Неправильно выбранная партия или цех")
+        
+        return cleaned_data
