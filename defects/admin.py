@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Worker, Workshop, DefectType, Batch, ManufacturingDefect
+from .models import *
 from django.utils.html import format_html
 
 @admin.register(Worker)
@@ -32,6 +32,16 @@ class BatchAdmin(admin.ModelAdmin):
         return format_html('<span style="color: red;">Завершена</span>')
     status.short_description = 'Статус'
 
-admin.site.register(Workshop)
-admin.site.register(DefectType)
-admin.site.register(ManufacturingDefect)
+admin.site.register(
+    [
+        Workshop,
+        DefectType,
+        EquipmentModel,
+        Equipment,
+        ManufacturingDefect,
+        Maintenance,
+        AIAgent,
+        AIRecommendation,
+    ]
+    
+)
