@@ -1,4 +1,5 @@
 import os
+import config
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -6,7 +7,9 @@ SECRET_KEY = 'ваш_секретный_ключ'
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    config.ServerSetting.IP,
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
