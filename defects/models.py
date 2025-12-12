@@ -115,24 +115,37 @@ class Equipment(models.Model):
         db_table = 'equipment'
 
     def __str__(self):
-        return f"Дефект {self.id} (партия {self.batch_id})"
+        return self.name
+
+
+class ManufacturingDefect(models.Model):
+    worker = models.ForeignKey(Worker, on_delete=models.CASCADE)
+    workshop = models.ForeignKey(Workshop, on_delete=models.CASCADE)
+    batch = models.ForeignKey(Batch, on_delete=models.CASCADE)
+    equipment = models.ForeignKey(Equipment, on_delete=models.CASCADE)
+    defect_type = models.ForeignKey(DefectType, on_delete=models.CASCADE)
+    date = models.DateTimeField(auto_now_add=True)
+    comment = models.TextField(null=True, blank=True)
 
     class Meta:
+        db_table = 'manufacturing_defects'
         verbose_name = "Дефект производства"
         verbose_name_plural = "Дефекты производства"
-        db_table = 'manufacturing_defects'
+
+    def __str__(self):
+        return f"Дефект {self.id} (партия {self.batch_id})"
 
     def clean(self):
-        # Проверяем только если оба поля установлены
-        if hasattr(self, 'batch') and hasattr(self, 'workshop') and self.batch and self.workshop:
+        if self.batch and self.workshop:
             supported_series = self.workshop.get_supported_series()
-            # Если цех - отдел качества (id=3), пропускаем проверку
             if self.workshop.id != 3 and self.batch.series not in supported_series:
                 raise ValidationError("Неправильно выбранная партия или цех")
 
     def save(self, *args, **kwargs):
         self.clean()
         super().save(*args, **kwargs)
+
+
 class Maintenance(models.Model):
     equipment = models.ForeignKey(Equipment, on_delete=models.CASCADE)
     date = models.DateField()
