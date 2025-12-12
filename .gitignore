@@ -105,3 +105,6 @@ media/
 
 # Static
 staticfiles/
+
+# AI
+ai/management/
