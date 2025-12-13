@@ -109,3 +109,5 @@ staticfiles/
 
 # AI
 ai/management/
+ai/data/
+ai/models/
