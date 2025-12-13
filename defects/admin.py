@@ -40,8 +40,6 @@ admin.site.register(
         Equipment,
         ManufacturingDefect,
         Maintenance,
-        AIAgent,
-        AIRecommendation,
     ]
     
 )

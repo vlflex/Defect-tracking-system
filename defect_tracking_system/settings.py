@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'django_pandas',
     'defects',
+    'ai',
 ]
 
 MIDDLEWARE = [
