@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Дефект #{{ defect.id }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0">Дефект #{{ defect.id }}</h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Основная информация</h5>
+                        <table class="table">
+                            <tr>
+                                <th>Дата и время:</th>
+                                <td>{{ defect.date|date:"d.m.Y H:i" }}</td>
+                            </tr>
+                            <tr>
+                                <th>Цех:</th>
+                                <td>{{ defect.workshop.name }}</td>
+                            </tr>
+                            <tr>
+                                <th>Тип дефекта:</th>
+                                <td>{{ defect.defect_type.name }}</td>
+                            </tr>
+                            <tr>
+                                <th>Партия:</th>
+                                <td>{{ defect.batch.series }} (ID: {{ defect.batch.id }})</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h5>Оборудование и работник</h5>
+                        <table class="table">
+                            <tr>
+                                <th>Оборудование:</th>
+                                <td>
+                                    {% if defect.equipment %}
+                                        {{ defect.equipment.name }}
+                                    {% else %}
+                                        Не указано
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Работник:</th>
+                                <td>
+                                    {% if worker_info %}
+                                        {{ worker_info.name }} ({{ worker_info.tab_number }})<br>
+                                        <small class="text-muted">{{ worker_info.position }}</small>
+                                    {% else %}
+                                        {{ defect.worker_tab_num }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                {% if defect.comment %}
+                <div class="mt-4">
+                    <h5>Комментарий</h5>
+                    <div class="alert alert-light">
+                        {{ defect.comment|linebreaks }}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div class="mt-4">
+                    <a href="/defects/list/" class="btn btn-outline-primary">Назад к списку</a>
+                    <a href="/defects/form/" class="btn btn-primary">Новый дефект</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

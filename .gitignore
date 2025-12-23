@@ -14,7 +14,7 @@ defects/migrations/
 venv/
 env/
 ENV/
-venv_ai/
+pytorch_env/
 requirements.txt
 
 # IDE
@@ -109,3 +109,5 @@ staticfiles/
 
 # AI
 ai/management/
+ai/data/
+ai/models/

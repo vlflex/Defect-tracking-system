@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Информация о модели AI{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0">Информация о нейросетевой модели</h2>
+            </div>
+            <div class="card-body">
+                <p>Подробная информация о модели анализа оборудования.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">Технические характеристики</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Название модели:</strong><br>{{ model_details.name }}</p>
+                        <p><strong>Тип модели:</strong><br>{{ model_details.type }}</p>
+                        <p><strong>Архитектура:</strong><br>{{ model_details.architecture }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Время обучения:</strong><br>{{ model_details.training_time }}</p>
+                        <p><strong>Размер датасета:</strong><br>{{ model_details.dataset_size }}</p>
+                        <p><strong>Точность (F1):</strong><br>{{ model_details.f1_score }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">Анализируемые факторы</h4>
+            </div>
+            <div class="card-body">
+                {% for feature in features %}
+                <div class="mb-3">
+                    <h5>{{ feature.name }}</h5>
+                    <p class="small">{{ feature.description }}</p>
+                    <div class="row">
+                        <div class="col-6">
+                            <small>Влияние: <strong>{{ feature.impact }}</strong></small>
+                        </div>
+                        <div class="col-6 text-end">
+                            <small>Вес: <strong>{{ feature.weight }}</strong></small>
+                        </div>
+                    </div>
+                </div>
+                {% if not forloop.last %}<hr>{% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">Как работает модель?</h4>
+            </div>
+            <div class="card-body">
+                <p>Нейронная сеть проходит через 4 этапа:</p>
+                <ol class="small">
+                    <li><strong>Подготовка данных:</strong> Сбор и нормализация</li>
+                    <li><strong>Извлечение признаков:</strong> Вычисление параметров</li>
+                    <li><strong>Прогнозирование:</strong> Обработка через нейросеть</li>
+                    <li><strong>Интерпретация:</strong> Преобразование результата</li>
+                </ol>
+                <div class="alert alert-success">
+                    <strong>Порог принятия решения: 0.5</strong><br>
+                    Если вероятность > 0.5, система рекомендует замену оборудования.
+                </div>
+                <a href="/ai/check-equip/" class="btn btn-primary w-100">
+                    Протестировать модель
+                </a>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Метрики качества</h4>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6 mb-3">
+                        <div class="display-6 text-primary">{{ model_details.accuracy }}</div>
+                        <small>Точность</small>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="display-6 text-success">{{ model_details.precision }}</div>
+                        <small>Precision</small>
+                    </div>
+                    <div class="col-6">
+                        <div class="display-6 text-warning">{{ model_details.recall }}</div>
+                        <small>Recall</small>
+                    </div>
+                    <div class="col-6">
+                        <div class="display-6 text-info">{{ model_details.f1_score }}</div>
+                        <small>F1 Score</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
